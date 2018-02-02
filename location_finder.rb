@@ -1,8 +1,14 @@
 class LocationFinder
   class << self
-    def get_class_location(target)
-      Array.wrap(class_methods_locations(target)) +
+    def get_class_location(target, filter_ancestors_out: false)
+      locations = Array.wrap(class_methods_locations(target)) +
         Array.wrap(instance_methods_locations(target))
+
+      if filter_ancestors_out
+        locations - target.ancestors[1..-1].flat_map{|target| get_class_location(target)}.uniq
+      else
+        locations
+      end
     end
 
   private
